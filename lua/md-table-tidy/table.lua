@@ -32,7 +32,7 @@ function Table:add_column(header, align)
   table.insert(self.columns, {
     header = header or "",
     align = align or Table.alignments.DEFAULT,
-    width = #header,
+    width = vim.fn.strchars(header),
   })
 end
 
@@ -43,7 +43,7 @@ function Table:add_row(row)
     return
   end
   for col, cell in ipairs(row) do
-    self.columns[col].width = math.max(self.columns[col].width, #cell)
+    self.columns[col].width = math.max(self.columns[col].width, vim.fn.strchars(cell))
   end
   table.insert(self.rows, row)
 end

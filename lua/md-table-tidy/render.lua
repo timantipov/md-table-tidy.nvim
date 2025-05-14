@@ -34,7 +34,7 @@ end
 ---@return string
 function Render:render_row(row)
   return self:wrap_cells(Utils.map(row, function(v, i)
-    return self:align_cell(v, self.tbl.columns[i].width, self.tbl.columns[i].align)
+    return self:align_cell(v, self.tbl.columns[i].width - self.padding * 2, self.tbl.columns[i].align)
   end))
 end
 
@@ -70,6 +70,7 @@ end
 ---@param char? string char for rep
 ---@return string
 function Render:align_cell(str, width, align, char)
+  local strlen = vim.fn.strchars(str)
   width = (width + self.padding * 2) or 0
   align = align or Table.alignments.LEFT
   char = char or " "
@@ -79,23 +80,23 @@ function Render:align_cell(str, width, align, char)
     str = padding .. str .. padding
   end
 
-  if width < #str then
-    width = #str
+  if width < strlen then
+    width = strlen
   end
 
   if align == Table.alignments.RIGHT then
-    return string.rep(char, width - #str) .. str
+    return string.rep(char, width - strlen) .. str
   end
 
   if align == Table.alignments.CENTER then
-    local left = string.rep(char, math.floor((width - #str) / 2))
+    local left = string.rep(char, math.ceil((width - strlen) / 2))
     local right = left
-    if #left * 2 + #str < width then
-      right = left .. char
+    if vim.fn.strchars(left) * 2 + strlen > width then
+      right = string.sub(left, 2)
     end
     return left .. str .. right
   end
-  return str .. string.rep(char, width - #str)
+  return str .. string.rep(char, width - strlen)
 end
 
 return Render

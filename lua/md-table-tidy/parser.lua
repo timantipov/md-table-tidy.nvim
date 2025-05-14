@@ -5,15 +5,19 @@ local Table = require("md-table-tidy.table")
 local Parser = {}
 Parser.__index = Parser
 
----@return TableTidy.Table|nil
+---@return TableTidy.Table
 function Parser.parse()
   local bufnr = vim.api.nvim_get_current_buf()
   local tblNode = Parser.closest("pipe_table")
   local headers = {}
   if tblNode then
     local tbl = Table:new()
-    tbl.range.from, _, _, _ = tblNode:range()
+    tbl.range.from = tblNode:range()
     for node in tblNode:iter_children() do
+      if node:type() == "ERROR" then
+        error("Table parsing error", 0)
+      end
+
       -- Parse header
       if node:type() == "pipe_table_header" then
         for cellNode in node:iter_children() do
@@ -44,15 +48,17 @@ function Parser.parse()
       end
 
       -- Parse rows
-      if node:type() == "pipe_table_row" then
+      if node:type() == "pipe_table_row" and string.find(vim.treesitter.get_node_text(node, bufnr), "^%s*|") then
         local row = {}
         for cellNode in node:iter_children() do
           if cellNode:type() == "pipe_table_cell" then
             table.insert(row, Parser.trim(vim.treesitter.get_node_text(cellNode, bufnr)))
           end
         end
-        if #row == #tbl.columns then
-          tbl:add_row(row)
+
+        local success, err = pcall(tbl.add_row, tbl, row)
+        if not success then
+          error("Error in line " .. node:range() + 1 .. ". " .. err, 0)
         end
       end
       -- set table range (number of rows + heading + delimiter row)
@@ -60,7 +66,7 @@ function Parser.parse()
     end
     return tbl
   end
-  return nil
+  error("Table under cursor not found", 0)
 end
 
 ---@private

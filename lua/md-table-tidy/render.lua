@@ -81,7 +81,7 @@ end
 ---@param str string
 ---@param width? integer
 ---@param align? Table.Alignment
----@param char? string character for fill space
+---@param char? string filler
 ---@return string
 function Render:align_cell(str, width, align, char)
   local strlen = vim.fn.strchars(str)

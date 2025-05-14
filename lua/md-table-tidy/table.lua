@@ -41,8 +41,7 @@ end
 ---@param row TableTidy.Table.Row
 function Table:add_row(row)
   if next(row) and #row ~= #self.columns then
-    vim.notify("The number of cells does not match the number of columns.", vim.log.levels.ERROR)
-    return
+    error("The number of cells does not match the number of columns.", 0)
   end
   for col, cell in ipairs(row) do
     self.columns[col].width = math.max(self.columns[col].width, vim.fn.strchars(cell))

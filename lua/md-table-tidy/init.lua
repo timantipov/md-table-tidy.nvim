@@ -1,13 +1,13 @@
--- local packages = {
---   "md-table-tidy.table",
---   "md-table-tidy.column",
---   "md-table-tidy.utils",
---   "md-table-tidy.render",
---   "md-table-tidy.parser",
--- }
--- for _, p in ipairs(packages) do
---   package.loaded[p] = nil
--- end
+local packages = {
+  "md-table-tidy.table",
+  "md-table-tidy.column",
+  "md-table-tidy.utils",
+  "md-table-tidy.render",
+  "md-table-tidy.parser",
+}
+for _, p in ipairs(packages) do
+  package.loaded[p] = nil
+end
 --
 ---@class TableTidy.Config
 ---@field padding integer
@@ -48,15 +48,15 @@ M.register_keymap = function()
 end
 
 M.fmt = function()
-  local tbl = require("md-table-tidy.parser").parse()
-  if tbl then
-    local lines = require("md-table-tidy.render"):new({ padding = M.config.padding }):render(tbl)
-    vim.api.nvim_buf_set_lines(vim.api.nvim_get_current_buf(), tbl.range.from, tbl.range.to, true, lines)
+  local success, tbl = pcall(require("md-table-tidy.parser").parse)
+  if not success then
+    vim.notify(tostring(tbl), vim.log.levels.WARN, { title = "md-table-tidy" })
     return
   end
-  vim.notify("Table under cursor not found", vim.log.levels.WARN, { title = "md-table-tidy" })
+  local lines = require("md-table-tidy.render"):new({ padding = M.config.padding }):render(tbl)
+  vim.api.nvim_buf_set_lines(vim.api.nvim_get_current_buf(), tbl.range.from, tbl.range.to, true, lines)
 end
 
--- M.fmt()
+M.fmt()
 
 return M

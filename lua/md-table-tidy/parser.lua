@@ -10,7 +10,6 @@ function Parser.parse()
   local bufnr = vim.api.nvim_get_current_buf()
   local tblNode = Parser.closest("pipe_table")
   if tblNode then
-    ---@type TableTidy.Table
     local tbl = Table:new()
     tbl.range.from, _, _, _ = tblNode:range()
     for node in tblNode:iter_children() do

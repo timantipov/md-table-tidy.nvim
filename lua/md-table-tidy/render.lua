@@ -34,7 +34,8 @@ end
 ---@return string
 function Render:render_row(row)
   return self:wrap_cells(Utils.map(row, function(v, i)
-    return self:align_cell(v, self.tbl.columns[i].width - self.padding * 2, self.tbl.columns[i].align)
+    local width = self.tbl.columns[i].width - self.padding * 2
+    return self:align_cell(v, width, self.tbl.columns[i].align)
   end))
 end
 
@@ -42,17 +43,17 @@ end
 ---@return string
 function Render:render_delimiter()
   return self:wrap_cells(Utils.map(self.tbl.columns, function(col, _)
-    local aligment = self:align_cell("-", col.width, col.align, "-")
+    local width = col.width + self.padding * 2
     if col.align == Table.alignments.LEFT then
-      aligment = ":" .. string.sub(aligment, 2)
+      return ":" .. string.rep("-", width - 1)
     end
     if col.align == Table.alignments.RIGHT then
-      aligment = string.sub(aligment, 2) .. ":"
+      return string.rep("-", width - 1) .. ":"
     end
     if col.align == Table.alignments.CENTER then
-      aligment = ":" .. string.sub(aligment, 2, -2) .. ":"
+      return ":" .. string.rep("-", width - 2) .. ":"
     end
-    return aligment
+    return string.rep("-", width)
   end))
 end
 
@@ -67,18 +68,16 @@ end
 ---@param str string
 ---@param width? integer
 ---@param align? Table.Alignment
----@param char? string char for rep
+---@param char? string character for fill space
 ---@return string
 function Render:align_cell(str, width, align, char)
   local strlen = vim.fn.strchars(str)
-  width = (width + self.padding * 2) or 0
+  width = (width + self.padding * 2) or strlen
   align = align or Table.alignments.LEFT
   char = char or " "
 
-  if char == " " then
-    local padding = string.rep(" ", self.padding)
-    str = padding .. str .. padding
-  end
+  local padding = string.rep(char, self.padding)
+  str = padding .. str .. padding
 
   if width < strlen then
     width = strlen

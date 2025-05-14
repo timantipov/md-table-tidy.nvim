@@ -29,7 +29,7 @@ function Render:render(tbl)
   -- fix width for narrow columns
   local columns = tbl.columns
   for i, col in ipairs(tbl.columns) do
-    columns[i].width = math.max(min_widths[col.align], col.width)
+    columns[i].width = math.max(min_widths[col.align] - self.padding * 2, col.width)
   end
 
   local lines = {}

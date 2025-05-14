@@ -30,9 +30,9 @@ end
 ---@param align Table.Alignment
 ---@param width? integer
 function Table:add_column(header, align, width)
-  header = header or ""
+  header = header or " "
   table.insert(self.columns, {
-    header = header or " ",
+    header = header,
     align = align or Table.alignments.DEFAULT,
     width = width or vim.fn.strchars(header),
   })
@@ -43,8 +43,8 @@ function Table:add_row(row)
   if next(row) and #row ~= #self.columns then
     error("The number of cells does not match the number of columns.", 0)
   end
-  for col, cell in ipairs(row) do
-    self.columns[col].width = math.max(self.columns[col].width, vim.fn.strchars(cell))
+  for i, cell in ipairs(row) do
+    self.columns[i].width = math.max(self.columns[i].width, vim.fn.strchars(cell))
   end
   table.insert(self.rows, row)
 end

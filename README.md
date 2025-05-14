@@ -1,4 +1,3 @@
-
 # md-table-tidy.nvim
 
 A lightweight Neovim plugin for formatting markdown tables.
@@ -14,17 +13,17 @@ Just place your cursor anywhere inside a markdown table and trigger the formatte
 - [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
 - Tree-sitter parser for `markdown` (`:TSInstall markdown`)
 
-## Installation
+## Setup
 ### Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 ```lua
-return { "https://github.com/timantipov/md-table-tidy.nvim" }
-```
-## Configuration
-```lua
--- default config
-require("md-table-tidy").setup {
-  padding = 1,        -- number of spaces for cell padding
-  key = "<leader>tt", -- key for command :TableTidy<CR>
+return { "https://github.com/timantipov/md-table-tidy.nvim",
+    config = function()
+        -- default config
+        require("md-table-tidy").setup {
+          padding = 1,        -- number of spaces for cell padding
+          key = "<leader>tt", -- key for command :TableTidy<CR>
+        }
+    end
 }
 ```
 ## Usage

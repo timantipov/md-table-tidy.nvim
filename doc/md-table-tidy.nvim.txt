@@ -1,0 +1,50 @@
+*md-table-tidy.nvim.txt*  Lightweight plugin for formatting markdown tables.
+
+==============================================================================
+INTRODUCTION                                              *md-table-tidy.nvim*
+
+A lightweight Neovim plugin for formatting markdown tables.
+Just place your cursor anywhere inside a markdown table and trigger the 
+formatter — it aligns pipes, cells, and headers for clean and readable output.
+
+==============================================================================
+REQUIREMENTS                                      *md-table-tidy-requirements*
+
+nvim-treesitter: https://github.com/nvim-treesitter/nvim-treesitter
+Tree-sitter parser for `markdown` (`:TSInstall markdown`)
+
+==============================================================================
+SETUP                                                    *md-table-tidy-setup*
+
+Using lazy.nvim: https://github.com/folke/lazy.nvim ~
+>lua
+    return { "https://github.com/timantipov/md-table-tidy.nvim",
+        config = function()
+            -- default config
+            require("md-table-tidy").setup {
+              padding = 1,        -- number of spaces for cell padding
+              key = "<leader>tt", -- key for command :TableTidy<CR>
+            }
+        end
+    }
+<
+==============================================================================
+COMMANDS                                              *md-table-tidy-commands*
+
+:TableTidy                                                        *:TableTidy*
+     Format markdown table under cursor
+
+==============================================================================
+KEYBINDINGS                                           *md-table-tidy-keybinds*
+
+Default keybinding:
+    <leader>tt 
+
+==============================================================================
+CREDITS                                                *md-table-tidy-credits*
+
+Author: Timofey Antipov <timofey@antipov.dev>  
+License: MIT
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl

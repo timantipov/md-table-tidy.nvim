@@ -48,7 +48,11 @@ function Parser.parse()
       end
 
       -- Parse rows
-      if node:type() == "pipe_table_row" and string.find(vim.treesitter.get_node_text(node, bufnr), "^%s*|") then
+      if node:type() == "pipe_table_row" and not string.find(vim.treesitter.get_node_text(node, bufnr), "^%s*|") then
+        break
+      end
+
+      if node:type() == "pipe_table_row" then
         local row = {}
         for cellNode in node:iter_children() do
           if cellNode:type() == "pipe_table_cell" then

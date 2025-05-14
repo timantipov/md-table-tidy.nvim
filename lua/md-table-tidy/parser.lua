@@ -1,0 +1,96 @@
+local TsUtils = require("nvim-treesitter.ts_utils")
+local Table = require("md-table-tidy.table")
+
+---@class TableTidy.Parser
+local Parser = {}
+Parser.__index = Parser
+
+---@return TableTidy.Table|nil
+function Parser.parse()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local tblNode = Parser.closest("pipe_table")
+  if tblNode then
+    ---@type TableTidy.Table
+    local tbl = Table:new()
+    tbl.range.from, _, _, _ = tblNode:range()
+    for node in tblNode:iter_children() do
+      -- Parse header
+      if node:type() == "pipe_table_header" then
+        for cellNode in node:iter_children() do
+          if cellNode:type() == "pipe_table_cell" then
+            tbl:add_column(Parser.trim(vim.treesitter.get_node_text(cellNode, bufnr)))
+          end
+        end
+      end
+
+      -- Parse delimiter
+      if node:type() == "pipe_table_delimiter_row" then
+        for i, cellNode in ipairs(node:named_children()) do
+          if cellNode:type() ~= "|" then
+            -- using bitwise mask for calculate alignment
+            -- default:00 right:01 left:10 center:11
+            local align = Table.alignments.DEFAULT
+            for delimiterNode in cellNode:iter_children() do
+              if delimiterNode:type() == "pipe_table_align_left" then
+                align = bit.bor(align, 2)
+              end
+              if delimiterNode:type() == "pipe_table_align_right" then
+                align = bit.bor(align, 1)
+              end
+            end
+            tbl.columns[i].align = align
+          end
+        end
+      end
+
+      -- Parse rows
+      if node:type() == "pipe_table_row" then
+        local row = {}
+        for cellNode in node:iter_children() do
+          if cellNode:type() == "pipe_table_cell" then
+            table.insert(row, Parser.trim(vim.treesitter.get_node_text(cellNode, bufnr)))
+          end
+        end
+        if #row == #tbl.columns then
+          tbl:add_row(row)
+        end
+      end
+      -- set table range (number of rows + heading + delimiter row)
+      tbl.range.to = tbl.range.from + #tbl.rows + 2
+    end
+    return tbl
+  end
+  return nil
+end
+
+---@private
+---@param str string
+---@return string
+function Parser.trim(str)
+  return str:match("^%s*(.-)%s*$")
+end
+
+---@private
+---@param targetType string
+---@return TSNode|nil
+function Parser.closest(targetType)
+  local tree = vim.treesitter.get_parser()
+  local node = TsUtils.get_node_at_cursor()
+  while node do
+    if node:type() == targetType then
+      return node
+    end
+    -- in treesitter markdown grammar nodes with type (inline) are special and always has root level
+    -- https://github.com/tree-sitter-grammars/tree-sitter-markdown/issues/74
+    if node:type() == "inline" then
+      ---@diagnostic disable-next-line
+      node = tree:named_node_for_range({ node:range() })
+    end
+    if node then
+      node = node:parent()
+    end
+  end
+  return nil
+end
+
+return Parser

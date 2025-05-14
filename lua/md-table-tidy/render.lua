@@ -9,9 +9,8 @@ Render.__index = Render
 ---@param opts table<string, any>
 ---@return TableTidy.Renderer
 function Render:new(opts)
-  opts = vim.tbl_deep_extend("force", { padding = 1 }, opts or {})
+  opts = vim.tbl_deep_extend("force", { padding = 0 }, opts or {})
   return setmetatable({
-    tbl = nil,
     padding = opts.padding,
   }, self)
 end
@@ -19,30 +18,44 @@ end
 ---@param tbl TableTidy.Table
 ---@return string[] #rendered markdown lines
 function Render:render(tbl)
-  self.tbl = tbl
+  --> -, :- ,-: , :-:
+  local min_widths = {
+    [Table.alignments.DEFAULT] = 1,
+    [Table.alignments.LEFT] = 2,
+    [Table.alignments.RIGHT] = 2,
+    [Table.alignments.CENTER] = 3,
+  }
+
+  -- fix width for narrow columns
+  local columns = tbl.columns
+  for i, col in ipairs(tbl.columns) do
+    columns[i].width = math.max(min_widths[col.align], col.width)
+  end
+
   local lines = {}
-  table.insert(lines, self:render_row(Utils.pluck(self.tbl.columns, "header")))
-  table.insert(lines, self:render_delimiter())
-  for _, row in ipairs(self.tbl.rows) do
-    table.insert(lines, self:render_row(row))
+  table.insert(lines, self:render_row(Utils.pluck(columns, "header"), columns))
+  table.insert(lines, self:render_delimiter_row(columns))
+  for _, row in ipairs(tbl.rows) do
+    table.insert(lines, self:render_row(row, columns))
   end
   return lines
 end
 
 ---@private
 ---@param row TableTidy.Table.Row
+---@param columns TableTidy.Table.Column[]
 ---@return string
-function Render:render_row(row)
+function Render:render_row(row, columns)
   return self:wrap_cells(Utils.map(row, function(v, i)
-    local width = self.tbl.columns[i].width - self.padding * 2
-    return self:align_cell(v, width, self.tbl.columns[i].align)
+    return self:align_cell(v, columns[i].width, columns[i].align)
   end))
 end
 
 ---@private
+---@param columns TableTidy.Table.Column[]
 ---@return string
-function Render:render_delimiter()
-  return self:wrap_cells(Utils.map(self.tbl.columns, function(col, _)
+function Render:render_delimiter_row(columns)
+  return self:wrap_cells(Utils.map(columns, function(col, _)
     local width = col.width + self.padding * 2
     if col.align == Table.alignments.LEFT then
       return ":" .. string.rep("-", width - 1)
@@ -72,7 +85,6 @@ end
 ---@return string
 function Render:align_cell(str, width, align, char)
   local strlen = vim.fn.strchars(str)
-  width = (width + self.padding * 2) or strlen
   align = align or Table.alignments.LEFT
   char = char or " "
 
@@ -95,6 +107,7 @@ function Render:align_cell(str, width, align, char)
     end
     return left .. str .. right
   end
+
   return str .. string.rep(char, width - strlen)
 end
 

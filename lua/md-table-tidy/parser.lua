@@ -9,6 +9,7 @@ Parser.__index = Parser
 function Parser.parse()
   local bufnr = vim.api.nvim_get_current_buf()
   local tblNode = Parser.closest("pipe_table")
+  local headers = {}
   if tblNode then
     local tbl = Table:new()
     tbl.range.from, _, _, _ = tblNode:range()
@@ -17,7 +18,7 @@ function Parser.parse()
       if node:type() == "pipe_table_header" then
         for cellNode in node:iter_children() do
           if cellNode:type() == "pipe_table_cell" then
-            tbl:add_column(Parser.trim(vim.treesitter.get_node_text(cellNode, bufnr)))
+            table.insert(headers, Parser.trim(vim.treesitter.get_node_text(cellNode, bufnr)))
           end
         end
       end
@@ -37,7 +38,7 @@ function Parser.parse()
                 align = bit.bor(align, 1)
               end
             end
-            tbl.columns[i].align = align
+            tbl:add_column(headers[i], align)
           end
         end
       end

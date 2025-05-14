@@ -27,12 +27,14 @@ function Table:new()
 end
 
 ---@param header string
----@param align? Table.Alignment
-function Table:add_column(header, align)
+---@param align Table.Alignment
+---@param width? integer
+function Table:add_column(header, align, width)
+  header = header or ""
   table.insert(self.columns, {
-    header = header or "",
+    header = header or " ",
     align = align or Table.alignments.DEFAULT,
-    width = vim.fn.strchars(header),
+    width = width or vim.fn.strchars(header),
   })
 end
 

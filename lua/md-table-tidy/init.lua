@@ -1,14 +1,3 @@
-local packages = {
-  "md-table-tidy.table",
-  "md-table-tidy.column",
-  "md-table-tidy.utils",
-  "md-table-tidy.render",
-  "md-table-tidy.parser",
-}
-for _, p in ipairs(packages) do
-  package.loaded[p] = nil
-end
---
 ---@class TableTidy.Config
 ---@field padding integer
 ---@field key string
@@ -56,7 +45,5 @@ M.fmt = function()
   local lines = require("md-table-tidy.render"):new({ padding = M.config.padding }):render(tbl)
   vim.api.nvim_buf_set_lines(vim.api.nvim_get_current_buf(), tbl.range.from, tbl.range.to, true, lines)
 end
-
-M.fmt()
 
 return M

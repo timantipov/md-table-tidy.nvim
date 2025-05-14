@@ -16,14 +16,12 @@ Just place your cursor anywhere inside a markdown table and trigger the formatte
 ## Setup
 ### Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 ```lua
-return { "https://github.com/timantipov/md-table-tidy.nvim",
-    config = function()
-        -- default config
-        require("md-table-tidy").setup {
-          padding = 1,        -- number of spaces for cell padding
-          key = "<leader>tt", -- key for command :TableTidy<CR>
-        }
-    end
+return { "timantipov/md-table-tidy.nvim",
+    -- default config
+    opts = {
+      padding = 1,        -- number of spaces for cell padding
+      key = "<leader>tt", -- key for command :TableTidy<CR>
+    }
 }
 ```
 ## Usage

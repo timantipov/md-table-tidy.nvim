@@ -26,5 +26,3 @@ return { "timantipov/md-table-tidy.nvim",
 ```
 ## Usage
 Just hit `<leader>tt` or execute command `:TableTidy` on table under cursor
-## License
-[MIT](./LICENSE)

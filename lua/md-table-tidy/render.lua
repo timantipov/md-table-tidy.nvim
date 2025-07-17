@@ -1,5 +1,5 @@
-local Utils = require("md-table-tidy.utils")
-local Table = require("md-table-tidy.table")
+local Utils = require "md-table-tidy.utils"
+local Table = require "md-table-tidy.table"
 
 ---@class TableTidy.Renderer
 ---@field padding integer

@@ -36,10 +36,10 @@ function Parser.parse()
             local align = Table.alignments.DEFAULT
             for delimiterNode in cellNode:iter_children() do
               if delimiterNode:type() == "pipe_table_align_left" then
-                align = bit.bor(align, 2)
+                align = bit.bor(align, Table.alignments.LEFT)
               end
               if delimiterNode:type() == "pipe_table_align_right" then
-                align = bit.bor(align, 1)
+                align = bit.bor(align, Table.alignments.RIGHT)
               end
             end
             tbl:add_column(headers[i], align)

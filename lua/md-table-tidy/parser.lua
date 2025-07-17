@@ -1,5 +1,5 @@
-local TsUtils = require("nvim-treesitter.ts_utils")
-local Table = require("md-table-tidy.table")
+local TsUtils = require "nvim-treesitter.ts_utils"
+local Table = require "md-table-tidy.table"
 
 ---@class TableTidy.Parser
 local Parser = {}
@@ -8,7 +8,7 @@ Parser.__index = Parser
 ---@return TableTidy.Table
 function Parser.parse()
   local bufnr = vim.api.nvim_get_current_buf()
-  local tblNode = Parser.closest("pipe_table")
+  local tblNode = Parser.closest "pipe_table"
   local headers = {}
   if tblNode then
     local tbl = Table:new()
@@ -77,7 +77,7 @@ end
 ---@param str string
 ---@return string
 function Parser.trim(str)
-  return str:match("^%s*(.-)%s*$")
+  return str:match "^%s*(.-)%s*$"
 end
 
 ---@private
@@ -94,7 +94,7 @@ function Parser.closest(targetType)
     -- https://github.com/tree-sitter-grammars/tree-sitter-markdown/issues/74
     if node:type() == "inline" then
       ---@diagnostic disable-next-line
-      node = tree:named_node_for_range({ node:range() })
+      node = tree:named_node_for_range { node:range() }
     end
     if node then
       node = node:parent()

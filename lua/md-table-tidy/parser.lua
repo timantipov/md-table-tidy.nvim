@@ -85,6 +85,9 @@ end
 ---@return TSNode|nil
 function Parser.closest(targetType)
   local tree = vim.treesitter.get_parser()
+  if tree then
+    tree:parse()
+  end
   local node = TsUtils.get_node_at_cursor()
   while node do
     if node:type() == targetType then

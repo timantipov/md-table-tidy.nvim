@@ -2,13 +2,22 @@ local Ast = require "md-table-tidy.ast"
 local Parser = require "md-table-tidy.parser"
 local Render = require "md-table-tidy.render"
 
+---@class TableTidy.Config
+---@field padding integer
+---@field keymap table
+---@field key ?string @deprecated use keymap
+
 ---@class TableTidy
 local M = {}
 
 ---@type TableTidy.Config
 M.config = {
   padding = 1,
-  key = "<leader>tt",
+  key = nil,
+  keymap = {
+    table_tidy = "<leader>tt",
+    table_tidy_all = "<leader>ta",
+  },
 }
 
 M.setup = function(opts)
@@ -41,10 +50,16 @@ M.register_user_commands = function(bufnr)
 end
 
 M.register_keymap = function(bufnr)
-  vim.keymap.set("n", M.config.key, M.table_tidy, {
-    buffer = bufnr,
-    silent = true,
-  })
+  for name, key in pairs(M.config.keymap) do
+    if M[name] and key then
+      vim.keymap.set("n", key, M[name], { buffer = bufnr, silent = true })
+    end
+  end
+
+  -- For config backwards compatability
+  if M.config.key then
+    vim.keymap.set("n", M.config.key, M.table_tidy, { buffer = bufnr, silent = true })
+  end
 end
 
 M.table_tidy = function()

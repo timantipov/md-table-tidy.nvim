@@ -31,6 +31,13 @@ M.register_user_commands = function(bufnr)
     M.table_tidy,
     { desc = "Format markdown table under cursor" }
   )
+
+  vim.api.nvim_buf_create_user_command(
+    bufnr,
+    "TableTidyAll",
+    M.table_tidy_all,
+    { desc = "Format all markdown tables in file" }
+  )
 end
 
 M.register_keymap = function(bufnr)
@@ -41,12 +48,18 @@ M.register_keymap = function(bufnr)
 end
 
 M.table_tidy = function()
-  local node = Ast:get_closest_table_node(vim.treesitter.get_node())
+  local node = Ast.new():get_closest_table_node(vim.treesitter.get_node())
   if node then
     M._format(node)
     return
   end
   vim.notify("Table under cursor not found", vim.log.levels.WARN, { title = "md-table-tidy" })
+end
+
+M.table_tidy_all = function()
+  for _, node in Ast.new():get_table_nodes() do
+    M._format(node)
+  end
 end
 
 ---@private

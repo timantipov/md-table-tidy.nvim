@@ -1,9 +1,8 @@
----@class TableTidy.Config
----@field padding integer
----@field key string
+local Ast = require "md-table-tidy.ast"
+local Parser = require "md-table-tidy.parser"
+local Render = require "md-table-tidy.render"
 
 ---@class TableTidy
----@field config TableTidy.Config
 local M = {}
 
 ---@type TableTidy.Config
@@ -15,34 +14,46 @@ M.config = {
 M.setup = function(opts)
   M.config = vim.tbl_deep_extend("force", M.config, opts or {})
   vim.api.nvim_create_autocmd("FileType", {
+    group = vim.api.nvim_create_augroup("TableTidy", { clear = true }),
     pattern = "markdown",
-    callback = function()
-      M.register_user_commands()
-      vim.schedule(M.register_keymap)
+    callback = function(args)
+      local bufnr = args.buf
+      M.register_user_commands(bufnr)
+      M.register_keymap(bufnr)
     end,
   })
 end
 
-M.register_user_commands = function()
+M.register_user_commands = function(bufnr)
   vim.api.nvim_buf_create_user_command(
-    vim.api.nvim_get_current_buf(),
+    bufnr,
     "TableTidy",
-    M.fmt,
+    M.table_tidy,
     { desc = "Format markdown table under cursor" }
   )
 end
 
-M.register_keymap = function()
-  vim.keymap.set("n", M.config.key, ":TableTidy<cr>", { buffer = vim.api.nvim_get_current_buf(), silent = true })
+M.register_keymap = function(bufnr)
+  vim.keymap.set("n", M.config.key, M.table_tidy, {
+    buffer = bufnr,
+    silent = true,
+  })
 end
 
-M.fmt = function()
-  local success, tbl = pcall(require("md-table-tidy.parser").parse)
-  if not success then
-    vim.notify(tostring(tbl), vim.log.levels.WARN, { title = "md-table-tidy" })
+M.table_tidy = function()
+  local node = Ast:get_closest_table_node(vim.treesitter.get_node())
+  if node then
+    M._format(node)
     return
   end
-  local lines = require("md-table-tidy.render"):new({ padding = M.config.padding }):render(tbl)
+  vim.notify("Table under cursor not found", vim.log.levels.WARN, { title = "md-table-tidy" })
+end
+
+---@private
+---@param node TSNode
+function M._format(node)
+  local tbl = Parser.parse(vim.api.nvim_get_current_buf(), node)
+  local lines = Render:new({ padding = M.config.padding }):render(tbl)
   vim.api.nvim_buf_set_lines(vim.api.nvim_get_current_buf(), tbl.range.from, tbl.range.to, true, lines)
 end
 

@@ -17,13 +17,13 @@ Table.alignments = {
 }
 
 ---@return TableTidy.Table
-function Table:new()
+function Table.new()
   return setmetatable({
     columns = {},
     header = {},
     rows = {},
     range = { from = 0, to = 0 },
-  }, self)
+  }, Table)
 end
 
 ---@param header string

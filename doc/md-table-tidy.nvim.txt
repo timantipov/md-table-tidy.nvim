@@ -22,7 +22,10 @@ Using lazy.nvim: https://github.com/folke/lazy.nvim ~
         -- default config
         opts = {
           padding = 1,        -- number of spaces for cell padding
-          key = "<leader>tt", -- key for command :TableTidy<CR>
+          keymap = {
+            table_tidy = "<leader>tt", -- key for command :TableTidy<CR>
+            table_tidy_all = "<leader>ta", -- key for command :TableTidyAll<CR>
+          },
         }
     }
 <
@@ -31,12 +34,20 @@ COMMANDS                                              *md-table-tidy-commands*
 
 :TableTidy                                                        *:TableTidy*
      Format markdown table under cursor
+:TableTidyAll                                                   *:TableTidyAll*
+     Format all markdown tables in file
 
 ==============================================================================
 KEYBINDINGS                                           *md-table-tidy-keybinds*
 
-Default keybinding:
-    <leader>tt 
+Default mappings (if enabled): ~
+                                                            *md-table-tidy-tt*
+<leader>tt
+        Calls |:TableTidy|.
+
+                                                            *md-table-tidy-ta*
+<leader>ta
+        Calls |:TableTidyAll|.
 
 ==============================================================================
 CREDITS                                                *md-table-tidy-credits*

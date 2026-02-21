@@ -56,7 +56,7 @@ M.register_keymap = function(bufnr)
     end
   end
 
-  -- For config backwards compatability
+  -- For config backwards compatibility
   if M.config.key then
     vim.keymap.set("n", M.config.key, M.table_tidy, { buffer = bufnr, silent = true })
   end

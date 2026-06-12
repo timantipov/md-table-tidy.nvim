@@ -84,7 +84,7 @@ end
 ---@param char? string filler
 ---@return string
 function Render:align_cell(str, width, align, char)
-  local strlen = vim.fn.strchars(str)
+  local strlen = vim.fn.strwidth(str)
   align = align or Table.alignments.LEFT
   char = char or " "
 

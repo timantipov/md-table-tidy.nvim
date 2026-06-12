@@ -34,7 +34,7 @@ function Table:add_column(header, align, width)
   table.insert(self.columns, {
     header = header,
     align = align or Table.alignments.DEFAULT,
-    width = width or vim.fn.strchars(header),
+    width = width or vim.fn.strwidth(header),
   })
 end
 
@@ -44,7 +44,7 @@ function Table:add_row(row)
     error("The number of cells does not match the number of columns.", 0)
   end
   for i, cell in ipairs(row) do
-    self.columns[i].width = math.max(self.columns[i].width, vim.fn.strchars(cell))
+    self.columns[i].width = math.max(self.columns[i].width, vim.fn.strwidth(cell))
   end
   table.insert(self.rows, row)
 end
